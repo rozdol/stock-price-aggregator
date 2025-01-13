@@ -47,4 +47,10 @@ class PriceController extends Controller
     {
         //
     }
+
+    public function fetchPrice()
+    {
+        // Your logic for fetching prices
+        return response()->json(['message' => 'Fetched prices successfully']);
+    }
 }
