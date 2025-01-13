@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Stock;
+use App\Models\StockPrice;
 
-class StockController extends Controller
+class PriceController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $stocks = Stock::get();
+        $stocks = StockPrice::get();
         return response()->json($stocks);
     }
 
@@ -21,11 +21,7 @@ class StockController extends Controller
      */
     public function store(Request $request)
     {
-        $stock = new Stock();
-        $stock->symbol = $request->symbol;
-        $stock->name = $request->name;
-        $stock->save();
-        return response()->json($stock);
+        //
     }
 
     /**
@@ -33,8 +29,7 @@ class StockController extends Controller
      */
     public function show(string $id)
     {
-        $stock = Stock::find($id);
-        return response()->json($stock);
+        //
     }
 
     /**
@@ -42,11 +37,7 @@ class StockController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $stock = Stock::find($id);
-        $stock->symbol = $request->symbol;
-        $stock->name = $request->name;
-        $stock->save();
-        return response()->json($stock);
+        //
     }
 
     /**
@@ -54,7 +45,6 @@ class StockController extends Controller
      */
     public function destroy(string $id)
     {
-        Stock::destroy($id);
-        return response()->json(['message' => 'Deleted']);
+        //
     }
 }

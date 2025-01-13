@@ -7,4 +7,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/stocks', [StockController::class, 'getSymblos']);
+// Route::get('/stocks/{symbol}', [StockController::class, 'getLatestPrice']);
+
+// Route::get('/stocks', [StockController::class, 'getSymblos']);
