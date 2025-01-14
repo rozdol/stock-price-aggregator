@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 
 use Illuminate\Console\Scheduling\AsScheduled;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 #[AsScheduled('everyMinute')]
 
@@ -65,20 +66,30 @@ class FetchStockPrices extends Command
                     ]);
 
                     // 
-                    $data = Cache::get("stock:{$stock->symbol}");
+                    $data = Cache::get("stock_bkp:{$stock->symbol}");
                     if ($data) {
                         // dump($data);
                         $previousPrice = $data['price'];
                         $change_pct = (($price - $previousPrice) / $previousPrice) * 100;
+                        $retrieved_at_prev = Carbon::parse($data['retrieved_at']);
+                        $secondsDifference = $retrieved_at_prev->diffInSeconds(now());
                     } else {
                         $change_pct = 0;
+                        $previousPrice = 0;
+                        $secondsDifference = 0;
                     }
                     // Update cache
-                    Cache::put("stock:{$stock->symbol}", [
+                    $cached_data = [
                         'price' => $price,
                         'change_pct' => $change_pct,
                         'retrieved_at' => now()->toDateTimeString(),
-                    ], 160);
+                    ];
+                    Log::info("{$stock->symbol} price:$price and $secondsDifference seconds from previous price=$previousPrice");
+
+                    // dump($cached_data);
+
+                    Cache::put("stock:{$stock->symbol}", $cached_data, 60); // keep only 60 seconds fresh prices
+                    Cache::put("stock_bkp:{$stock->symbol}", $cached_data, 3600); // keep data tocalculate change_pct of the refresh period is more than 60 seconds.
                     $this->info("Updated cache for $stock->symbol at price=$price with change_pct=$change_pct");
                 } else {
                     $this->error('ERROR. Chaeck API KEY');
