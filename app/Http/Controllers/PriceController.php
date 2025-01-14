@@ -236,4 +236,31 @@ class PriceController extends Controller
             'prices' => $prices,
         ]);
     }
+
+    public function showScreener()
+    {
+        // Fetch all symbols from the database
+        $stocks = Stock::all();
+
+        // Cache::put('stock:AAPL', ['price' => 150.00, 'change_pct' => 1.50], 60);
+        // Cache::put('stock:MSFT', ['price' => 250.00, 'change_pct' => -0.75], 60);
+        // Cache::put('stock:GOOG', ['price' => 2750.00, 'change_pct' => 0.00], 60);
+
+
+        // Fetch cached data for each stock
+        $screenerData = $stocks->map(function ($stock) {
+            $cacheData = Cache::get("stock:{$stock->symbol}");
+
+            return [
+                'symbol' => $stock->symbol,
+                'price' => $cacheData['price'] ?? null,
+                'change_pct' => $cacheData['change_pct'] ?? null,
+            ];
+        });
+
+        // Pass data to the view
+        return view('screener', [
+            'screenerData' => $screenerData,
+        ]);
+    }
 }
