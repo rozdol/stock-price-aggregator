@@ -82,78 +82,98 @@ class FetchStockPrices extends Command
         $isPremium = env("ALPHA_VANTAGE_PEMIUM", false);
         $is_delayed = env("ALPHA_VANTAGE_DELAYED", true);;
 
+        $delyed_str = $is_delayed ? 'delayed' : '';
+        $this->info("delyed_str: $delyed_str");
+
         // Get prices for all symbols in one query if the the account is premium
         if ($isPremium) {
             Log::info("Premium");
             $this->info("Premium");
             $symbols = Stock::pluck('symbol')->toArray();
             $commaSeparatedSymbols = implode(',', $symbols);
-            $response = Http::get("https://www.alphavantage.co/query", [
-                'function' => 'REALTIME_BULK_QUOTES',
-                'symbol' => $commaSeparatedSymbols,
-                'apikey' => $apiKey,
-            ]);
-            if ($response->ok()) {
-                // print_r($commaSeparatedSymbols);
-                $prices = $response->json()['data'] ?? null;
-                if ($prices) {
-                    // dd($response->json()['data']);
-                    foreach ($prices as $item) {
-                        $symbol = $item['symbol'];
-                        $price = (float) $item['close'];
+            try {
+                $response = Http::retry(3, 1000) // Retry up to 3 times with 1-second intervals
+                    ->timeout(5) // Set a timeout of 5 seconds
+                    ->get("https://www.alphavantage.co/query", [
+                        'function' => 'REALTIME_BULK_QUOTES',
+                        'symbol' => $commaSeparatedSymbols,
+                        'apikey' => $apiKey,
+                    ]);
+                if ($response->ok()) {
+                    // print_r($commaSeparatedSymbols);
+                    $prices = $response->json()['data'] ?? null;
+                    if ($prices) {
+                        // dd($response->json()['data']);
+                        foreach ($prices as $item) {
+                            $symbol = $item['symbol'];
+                            $price = (float) $item['close'];
 
-                        // Store in DB
-                        $this->storePrice($symbol, $price);
+                            // Store in DB
+                            $this->storePrice($symbol, $price);
 
-                        echo ("Symbol: $symbol \n");
-                        $data = $response->json()['Global Quote'] ?? null;
+                            echo ("Symbol: $symbol \n");
+                            $data = $response->json()['Global Quote'] ?? null;
+                        }
+                    } else {
+                        $this->error("Failed to fetch data for stock: {$commaSeparatedSymbols} (HTTP Status: {$response->status()})");
                     }
                 } else {
-                    $this->error('ERROR. Check API KEY');
+                    $this->info('No data for  ' . $commaSeparatedSymbols);
                 }
-            } else {
-                $this->info('No data for  ' . $commaSeparatedSymbols);
+            } catch (\Exception $e) {
+                // Catch exceptions (e.g., connection issues, timeouts)
+                $this->error("Error fetching data for stock: {$commaSeparatedSymbols} - {$e->getMessage()}");
+                Log::error("Error fetching data for stock: {$commaSeparatedSymbols}", ['exception' => $e]);
             }
         } else {
             // Get prices for symbols one by one if the the account is not premium
             Log::info("NOT Premium");
             $this->info("NOT Premium");
             foreach ($stocks as $stock) {
-                $response = Http::get("https://www.alphavantage.co/query", [
-                    'function' => 'GLOBAL_QUOTE',
-                    'symbol' => $stock->symbol,
-                    'entitlement' => 'delayed',
-                    'apikey' => $apiKey,
-                ]);
+                try {
 
-                // dd($response->json());
-                $this->info('Quering ' . $stock->symbol);
+                    $response = Http::retry(3, 1000) // Retry up to 3 times with 1-second intervals
+                        ->timeout(5) // Set a timeout of 5 seconds
+                        ->get("https://www.alphavantage.co/query", [
+                            'function' => 'GLOBAL_QUOTE',
+                            'symbol' => $stock->symbol,
+                            'entitlement' => $delyed_str,
+                            'apikey' => $apiKey,
+                        ]);
 
-                if ($response->ok()) {
-                    // dd($response);
-                    if ($is_delayed) {
-                        $data = $response->json()['Global Quote - DATA DELAYED BY 15 MINUTES'] ?? null;
-                    } else {
-                        $data = $response->json()['Global Quote'] ?? null;
-                    }
+                    // dd($response->json());
+                    $this->info('Quering ' . $stock->symbol);
 
-                    // dd($data);
-                    if ($data) {
+                    if ($response->ok()) {
+                        // dd($response);
+                        if ($is_delayed) {
+                            $data = $response->json()['Global Quote - DATA DELAYED BY 15 MINUTES'] ?? null;
+                        } else {
+                            $data = $response->json()['Global Quote'] ?? null;
+                        }
+
                         // dd($data);
-                        $price = (float) $data['05. price'];
-                        $this->info($stock->symbol . ': ' . $price);
+                        if ($data) {
+                            // dd($data);
+                            $price = (float) $data['05. price'];
+                            $this->info($stock->symbol . ': ' . $price);
 
-                        // Store in DB
-                        $this->storePrice($stock->symbol, $price);
+                            // Store in DB
+                            $this->storePrice($stock->symbol, $price);
 
 
-                        // 
+                            // 
 
+                        } else {
+                            Log::error("Failed to fetch data for stock: {$stock->symbol} (HTTP Status: {$response->status()})");
+                        }
                     } else {
-                        $this->error('ERROR. Check API KEY');
+                        $this->info('No data for  ' . $stock->symbol);
                     }
-                } else {
-                    $this->info('No data for  ' . $stock->symbol);
+                } catch (\Exception $e) {
+                    // Catch exceptions (e.g., connection issues, timeouts)
+                    $this->error("Error fetching data for stock: {$stock->symbol} - {$e->getMessage()}");
+                    Log::error("Error fetching data for stock: {$stock->symbol}", ['exception' => $e]);
                 }
             }
 

@@ -104,7 +104,7 @@ Add a cron task `crottab -e` to run the price updated every minute
  
  ✅ Perform HTTP requests to the Alpha Vantage API securely and eﬃciently.
  
- ❌ Implement error handling mechanisms to manage potential API rate limiting and connection issues.
+ ✅ Implement error handling mechanisms to manage potential API rate limiting and connection issues.
  
  ✅ Implement caching to store the latest stock price data for a short duration.
  
@@ -123,4 +123,4 @@ Add a cron task `crottab -e` to run the price updated every minute
 
  ❌ Containerize the application using Docker & Docker compose.
 
- ❌ Design and implement a user interface that shows the latest stock price with visual indicators (e.g: color-coded arrows) to display positive or negative changes
+ ✅ Design and implement a user interface that shows the latest stock price with visual indicators (e.g: color-coded arrows) to display positive or negative changes
