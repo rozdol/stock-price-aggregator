@@ -16,7 +16,7 @@ The app is getting prices for a predifined list of stocks from Alpha Vantage and
 ## Setup
 1. Clone the repository.
 2. Run `composer install`.
-3. Configure `.env` with database and Alpha Vantage API key.
+3. Configure `.env` with database and Alpha Vantage API key `ALPHA_VANTAGE_API_KEY='KEY'` and `ALPHA_VANTAGE_PEMIUM=false/true`.
 4. Run migrations: `php artisan migrate`.
 5. Run seedet to add a list of stocks `php artisan db:seed --class=StocksTableSeeder`.
 6. Schedule the command: `php artisan schedule:run`.

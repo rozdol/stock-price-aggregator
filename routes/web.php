@@ -1,12 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\StockController;
+use App\Http\Controllers\PriceController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Route::get('/stocks/{symbol}', [StockController::class, 'getLatestPrice']);
-
-// Route::get('/stocks', [StockController::class, 'getSymblos']);
+Route::get('/chart/{symbol}', [PriceController::class, 'showChart']);
+Route::get('/screener', [PriceController::class, 'showScreener']);

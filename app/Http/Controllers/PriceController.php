@@ -208,4 +208,32 @@ class PriceController extends Controller
         }
         return $report;
     }
+
+    public function showChart($symbol)
+    {
+        // Find the stock by symbol
+        $stock = Stock::where('symbol', $symbol)->first();
+
+        if (!$stock) {
+            return abort(404, 'Stock not found');
+        }
+
+        // Fetch prices for the stock
+        $prices = $stock->prices()
+            ->orderBy('retrieved_at', 'asc')
+            // ->limit(60)
+            ->get(['price', 'retrieved_at'])
+            ->map(function ($price) {
+                return [
+                    'price' => $price->price,
+                    'retrieved_at' => $price->retrieved_at->toDateTimeString(),
+                ];
+            });
+
+        // Pass data to the view
+        return view('chart', [
+            'symbol' => $symbol,
+            'prices' => $prices,
+        ]);
+    }
 }
