@@ -13,7 +13,7 @@ use Illuminate\Console\Scheduling\AsScheduled;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
-// #[AsScheduled('everyMinute')]
+// #[AsScheduled('everyMinute')] 
 
 class FetchStockPrices extends Command
 {
@@ -31,6 +31,10 @@ class FetchStockPrices extends Command
      */
     protected $description = 'Fetch real-time stock prices and store them in the database.';
 
+
+    /**
+     * Save data in database and in cache
+     */
     private function storePrice($symbol, $price)
     {
         $stockId = Stock::where('symbol', $symbol)->value('id');
@@ -77,6 +81,19 @@ class FetchStockPrices extends Command
      */
     public function handle()
     {
+
+        /**
+         * We can utilize the API endpoint to fetch multiple symbols in one request if we have
+         * a premium subscription. Otherwise, we fetch prices for each symbol per request.
+         * 
+         * The command uses try-catch construction to implement error handling.
+         * Also we use Http::retry to improve sustainability.
+         * 
+         * We use the main cache to hold only fresh data, and a backup cache to get previous prices for change calculations
+         * 
+         */
+
+
         $stocks = Stock::all();
         $apiKey = env("ALPHA_VANTAGE_API_KEY", "demo");
         $isPremium = env("ALPHA_VANTAGE_PEMIUM", false);
