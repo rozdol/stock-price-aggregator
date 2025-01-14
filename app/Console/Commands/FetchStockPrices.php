@@ -80,7 +80,7 @@ class FetchStockPrices extends Command
         $stocks = Stock::all();
         $apiKey = env("ALPHA_VANTAGE_API_KEY", "demo");
         $isPremium = env("ALPHA_VANTAGE_PEMIUM", false);
-        $is_delayed = true;
+        $is_delayed = env("ALPHA_VANTAGE_DELAYED", true);;
 
         // Get prices for all symbols in one query if the the account is premium
         if ($isPremium) {
