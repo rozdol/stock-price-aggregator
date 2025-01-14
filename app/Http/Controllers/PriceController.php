@@ -243,6 +243,7 @@ class PriceController extends Controller
         // Fetch all symbols from the database
         $stocks = Stock::all();
 
+        // To test the arrows:
         // Cache::put('stock:AAPL', ['price' => 150.00, 'change_pct' => 1.50], 60);
         // Cache::put('stock:MSFT', ['price' => 250.00, 'change_pct' => -0.75], 60);
         // Cache::put('stock:GOOG', ['price' => 2750.00, 'change_pct' => 0.00], 60);

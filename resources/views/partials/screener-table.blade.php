@@ -1,6 +1,10 @@
 @foreach ($screenerData as $data)
     <tr>
-        <td><strong>{{ $data['symbol'] }}</strong></td>
+        <td>
+            <a href="{{ url('/chart/' . $data['symbol']) }}">
+            <strong>{{ $data['symbol'] }}</strong>
+            </a>
+        </td>
         <td>
             {{ $data['price'] }}
             @if (!is_null($data['change_pct']) && is_numeric($data['change_pct']))

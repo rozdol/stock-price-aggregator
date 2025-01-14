@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Price Chart - {{ $symbol }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Price Chart for {{ $symbol }}</h1>
-    <canvas id="priceChart" width="800" height="400"></canvas>
+    <div class="container mt-5">
+        <h1>Price Chart for {{ $symbol }}</h1>
+        <div class="table-responsive">    
+            <canvas id="priceChart" width="800" height="400"></canvas>
+        </div>
+    </div>
 
     <script>
         const labels = {!! json_encode($prices->pluck('retrieved_at')) !!};
