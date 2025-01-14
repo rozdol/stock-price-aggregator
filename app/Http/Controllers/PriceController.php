@@ -144,4 +144,68 @@ class PriceController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    public function makeReportFromDB()
+    {
+        $stocks = Stock::with(['prices' => function ($query) {
+            $query->latest('retrieved_at')->limit(2);
+        }])->get();
+
+
+        // return $stocks;
+        // Format the response
+        $report = [];
+
+        foreach ($stocks as $item) {
+            // print_r($item);
+            $currentPrice = $item->prices[0]->price;
+            $previousPrice = $item->prices[1]->price;
+            $change_pct = (($currentPrice - $previousPrice) / $previousPrice) * 100;
+            $report[] = [
+                'symbol'  => $item->symbol,
+                'name'  => $item->name,
+                'price' => $currentPrice,
+                'price_prev' => $previousPrice,
+                'change_pct' => $change_pct
+            ];
+        }
+        return $report;
+
+        $report = $stocks->map(function ($stock) {
+            return [
+                'symbol' => $stock->symbol,
+                'name' => $stock->name,
+                'latest_prices' => $stock->prices->map(function ($price) {
+                    return [
+                        'price' => $price->price,
+                        'retrieved_at' => $price->retrieved_at->toDateTimeString(),
+                    ];
+                }),
+            ];
+        });
+
+        return response()->json($report);
+    }
+
+    public function makeReport()
+    {
+        $stocks = Stock::all();
+
+        $report = [];
+        foreach ($stocks as $stock) {
+            $data = Cache::get("stock:{$stock->symbol}");
+            // dump($data);
+            if ($data) {
+                $report[] = [
+                    'symbol'  => $stock->symbol,
+                    'name'  => $stock->name,
+                    'price' => $data['price'],
+                    'change_pct' => $data['change_pct']
+                ];
+            }
+
+
+            // $data = Cache::get("stock:{$symbol}");
+        }
+        return $report;
+    }
 }

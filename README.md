@@ -92,3 +92,31 @@ Add a cron task `crottab -e` to run the price updated every minute
 ```bash
  * * * * * cd /{path_to_repo}/stock-price-aggregator && php artisan schedule:run >> /dev/null 2>&1
  ```
+
+## Features covered
+ ✅ Integrate with the Alpha Vantage API to fetch real-time stock price data for a predefined set of stocks
+ 
+ ✅ Implement and automated mechanism to fetch the stock price data at regular intervals
+ 
+ ✅ Perform HTTP requests to the Alpha Vantage API securely and eﬃciently.
+ 
+ ❌ Implement error handling mechanisms to manage potential API rate limiting and connection issues.
+ 
+ ✅ Implement caching to store the latest stock price data for a short duration.
+ 
+ ✅ Make sure to keep the cached data up-to-date.
+ 
+ ✅ Implement and endpoint to fetch the latest stock price from the cache.
+ 
+ ✅ Design a database schema optimized for storing and retrieving all the price data of the specified stock
+ 
+ ✅ Optimize database queries for eﬃcient retrieval of stock data, considering frequent updates
+ 
+ ✅ Develop a reporting system that allows users to view real-time stock prices and percentage changes.
+
+
+**Bonus**
+
+ ❌ Containerize the application using Docker & Docker compose.
+
+ ❌ Design and implement a user interface that shows the latest stock price with visual indicators (e.g: color-coded arrows) to display positive or negative changes

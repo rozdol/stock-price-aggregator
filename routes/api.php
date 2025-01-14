@@ -9,6 +9,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::get('report', [PriceController::class, 'makeReport']);
 Route::get('prices/fetch', [PriceController::class, 'fetchPrice']);
 Route::get('prices/{symbol}', [PriceController::class, 'getLatestPrice']);
 Route::get('history/{symbol}', [PriceController::class, 'getHistory']);
