@@ -13,7 +13,7 @@ use Illuminate\Console\Scheduling\AsScheduled;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
-#[AsScheduled('everyMinute')]
+// #[AsScheduled('everyMinute')]
 
 class FetchStockPrices extends Command
 {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Models\StockPrice;
 use App\Models\Stock;
 use Illuminate\Support\Facades\Artisan;
@@ -262,5 +263,23 @@ class PriceController extends Controller
         return view('screener', [
             'screenerData' => $screenerData,
         ]);
+    }
+
+    public function getScreenerData()
+    {
+        // Fetch all symbols and their cached data
+        $stocks = Stock::all();
+
+        $screenerData = $stocks->map(function ($stock) {
+            $cacheData = Cache::get("stock:{$stock->symbol}");
+            return [
+                'symbol' => $stock->symbol,
+                'price' => $cacheData['price'] ?? 'N/A',
+                'change_pct' => $cacheData['change_pct'] ?? 'N/A',
+            ];
+        });
+
+        // Return only the table rows as HTML
+        return view('partials.screener-table', compact('screenerData'))->render();
     }
 }

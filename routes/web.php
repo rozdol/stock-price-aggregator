@@ -9,3 +9,4 @@ Route::get('/', function () {
 
 Route::get('/chart/{symbol}', [PriceController::class, 'showChart']);
 Route::get('/screener', [PriceController::class, 'showScreener']);
+Route::get('/screener/data', [PriceController::class, 'getScreenerData'])->name('screener.data');

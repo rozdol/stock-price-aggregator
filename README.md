@@ -27,6 +27,10 @@ The app is getting prices for a predifined list of stocks from Alpha Vantage and
 - `GET /api/history/{symbol}`: Fetch the 60 minutes history the stock prices.
 - `GET /api/report`: Fetch a real-time stock report.
 
+## Pages
+- `/screener` : real-time stock screener.
+- `/chart/{symbol}` : Chart of last 200 price sapmles.
+
 ## Testing
 Run tests with:
 ```bash
