@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+// use Illuminate\Foundation\Testing\RefreshDatabase;
+// use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Stock;
-use App\Models\StockPrice;
-use Illuminate\Support\Facades\Http;
+// use App\Models\Stock;
+// use App\Models\StockPrice;
+// use Illuminate\Support\Facades\Http;
 
 class StockTest extends TestCase
 {
