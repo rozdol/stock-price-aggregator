@@ -3,10 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PriceController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
+Route::get('/', function () {
+    return redirect('/screener');
+});
 
 Route::get('/chart/{symbol}', [PriceController::class, 'showChart'])->name('chart');
 Route::get('/screener', [PriceController::class, 'showScreener'])->name('screener');;

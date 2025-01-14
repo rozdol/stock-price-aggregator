@@ -19,7 +19,8 @@ The app is getting prices for a predifined list of stocks from Alpha Vantage and
 3. Configure `.env` with database and Alpha Vantage API key `ALPHA_VANTAGE_API_KEY='KEY'` and `ALPHA_VANTAGE_PEMIUM=false/true`.
 4. Run migrations: `php artisan migrate`.
 5. Run seedet to add a list of stocks `php artisan db:seed --class=StocksTableSeeder`.
-6. Schedule the command: `php artisan schedule:run`.
+6. Schedule the command: `php artisan schedule:run`
+7. As a fallback for auto fetching you can run `scripts/run_infinite.sh`
 
 ## API Endpoints
 - `GET /api/stocks`: Fetch the list of available stocks.
