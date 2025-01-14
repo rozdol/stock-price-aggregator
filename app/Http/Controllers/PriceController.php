@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\StockPrice;
+use App\Models\Stock;
 use Illuminate\Support\Facades\Artisan;
+use Carbon\Carbon;
 
 class PriceController extends Controller
 {
@@ -48,7 +50,43 @@ class PriceController extends Controller
     {
         //
     }
+    public function getHistory($symbol)
+    {
+        $stock = Stock::where('symbol', $symbol)->first();
+        if (!$stock) {
+            return response()->json(['message' => 'Stock not found.'], 404);
+        }
+        $prices = $stock->prices()
+            ->where('retrieved_at', '>=', Carbon::now()->subMinutes(60))
+            ->orderBy('retrieved_at', 'desc')
+            ->get(['price', 'retrieved_at']);
 
+        if ($prices->isEmpty()) {
+            return response()->json(['message' => 'No price data available for the last 60 minutes.'], 404);
+        }
+
+        $history = [];
+        $previousPrice = null;
+
+        foreach ($prices as $price) {
+            $returns = null; // Default if there's no previous price
+
+            if ($previousPrice !== null) {
+                $returns = (($price->price - $previousPrice) / $previousPrice) * 100;
+            }
+
+            $history[] = [
+                'symbol' => $symbol,
+                'price' => $price->price,
+                'returns' => $returns !== null ? round($returns, 2) : null, // Round to 2 decimals
+                'retrieved_at' => $price->retrieved_at->toDateTimeString(),
+            ];
+
+            $previousPrice = $price->price; // Update previous price
+        }
+
+        return response()->json($history);
+    }
     public function fetchPrice()
     {
         try {
