@@ -80,6 +80,7 @@ class FetchStockPrices extends Command
         $stocks = Stock::all();
         $apiKey = env("ALPHA_VANTAGE_API_KEY", "demo");
         $isPremium = env("ALPHA_VANTAGE_PEMIUM", false);
+        $is_delayed = true;
 
         // Get prices for all symbols in one query if the the account is premium
         if ($isPremium) {
@@ -121,14 +122,21 @@ class FetchStockPrices extends Command
                 $response = Http::get("https://www.alphavantage.co/query", [
                     'function' => 'GLOBAL_QUOTE',
                     'symbol' => $stock->symbol,
+                    'entitlement' => 'delayed',
                     'apikey' => $apiKey,
                 ]);
 
+                // dd($response->json());
                 $this->info('Quering ' . $stock->symbol);
 
                 if ($response->ok()) {
                     // dd($response);
-                    $data = $response->json()['Global Quote'] ?? null;
+                    if ($is_delayed) {
+                        $data = $response->json()['Global Quote - DATA DELAYED BY 15 MINUTES'] ?? null;
+                    } else {
+                        $data = $response->json()['Global Quote'] ?? null;
+                    }
+
                     // dd($data);
                     if ($data) {
                         // dd($data);
