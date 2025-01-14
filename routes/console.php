@@ -10,4 +10,3 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 Schedule::command(FetchStockPrices::class)->everyMinute();
-// Artisan::call('fetch:stock-prices')->purpose('Fetch Prices')->everyMinute();

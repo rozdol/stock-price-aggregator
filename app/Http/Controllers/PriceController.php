@@ -7,6 +7,7 @@ use App\Models\StockPrice;
 use App\Models\Stock;
 use Illuminate\Support\Facades\Artisan;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class PriceController extends Controller
 {
@@ -50,6 +51,38 @@ class PriceController extends Controller
     {
         //
     }
+
+    public function getLatestPrice($symbol)
+    {
+        // Try to get stock data from cache
+        $data = Cache::get("stock:{$symbol}");
+        if (!$data) {
+            // Fallback: Query the database for the latest stock price
+            $stock = Stock::where('symbol', $symbol)->first();
+
+            if (!$stock) {
+                return response()->json(['message' => 'Stock not found.'], 404);
+            }
+
+            $latestPrice = $stock->prices()->latest('retrieved_at')->first();
+
+            if (!$latestPrice) {
+                return response()->json(['message' => 'Stock price data not available.'], 404);
+            }
+
+            // Format data
+            $data = [
+                'price' => $latestPrice->price,
+                'retrieved_at' => $latestPrice->retrieved_at->toDateTimeString(),
+            ];
+
+            // Store the data in cache for 1 minute
+            Cache::put("stock:{$symbol}", $data, 60);
+        }
+
+        return response()->json($data);
+    }
+
     public function getHistory($symbol)
     {
         $stock = Stock::where('symbol', $symbol)->first();
@@ -69,16 +102,16 @@ class PriceController extends Controller
         $previousPrice = null;
 
         foreach ($prices as $price) {
-            $returns = null; // Default if there's no previous price
+            $change_pct = null; // Default if there's no previous price
 
             if ($previousPrice !== null) {
-                $returns = (($price->price - $previousPrice) / $previousPrice) * 100;
+                $change_pct = (($price->price - $previousPrice) / $previousPrice) * 100;
             }
 
             $history[] = [
                 'symbol' => $symbol,
                 'price' => $price->price,
-                'returns' => $returns !== null ? round($returns, 2) : null, // Round to 2 decimals
+                'change_pct' => $change_pct !== null ? round($change_pct, 2) : null, // Round to 2 decimals
                 'retrieved_at' => $price->retrieved_at->toDateTimeString(),
             ];
 

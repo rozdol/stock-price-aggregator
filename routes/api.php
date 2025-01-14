@@ -10,6 +10,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::get('prices/fetch', [PriceController::class, 'fetchPrice']);
+Route::get('prices/{symbol}', [PriceController::class, 'getLatestPrice']);
 Route::get('history/{symbol}', [PriceController::class, 'getHistory']);
 Route::apiResource('stocks', StockController::class);
 Route::apiResource('prices', PriceController::class);

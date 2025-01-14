@@ -64,11 +64,22 @@ class FetchStockPrices extends Command
                         'retrieved_at' => now(),
                     ]);
 
+                    // 
+                    $data = Cache::get("stock:{$stock->symbol}");
+                    if ($data) {
+                        // dump($data);
+                        $previousPrice = $data['price'];
+                        $change_pct = (($price - $previousPrice) / $previousPrice) * 100;
+                    } else {
+                        $change_pct = 0;
+                    }
                     // Update cache
                     Cache::put("stock:{$stock->symbol}", [
                         'price' => $price,
+                        'change_pct' => $change_pct,
                         'retrieved_at' => now()->toDateTimeString(),
-                    ], 60);
+                    ], 160);
+                    $this->info("Updated cache for $stock->symbol at price=$price with change_pct=$change_pct");
                 } else {
                     $this->error('ERROR. Chaeck API KEY');
                 }
