@@ -37,6 +37,13 @@ class StockTest extends TestCase
         // Assert that the command runs successfully
         $this->assertEquals(0, $exitCode, 'Artisan command did not execute successfully.');
 
+        // Assert that the recent price is in cache
         $this->assertTrue(Cache::has('stock:MSFT'));
+
+        echo "Waiting 60 seconds for cache expiration...\n";
+
+        sleep(60);
+        // Assert that the value is no longer in the cache
+        $this->assertFalse(Cache::has('stock:MSFT'));
     }
 }

@@ -35,7 +35,7 @@ The app is getting prices for a predifined list of stocks from Alpha Vantage and
 ## Testing
 Run tests with:
 ```bash
-php artisan test
+php artisan test --filter StockTest
 ```
 
 ## MAC OS scheduled task
